@@ -1,0 +1,30 @@
+{
+  "name" : "MrFragIT/GeoNamesBundle",
+  "description" : "Simple importer for GeoNames.org data",
+  "type" : "symfony-bundle",
+  "authors" : [{
+    "name" : "Matteo Crosta (Mr. Frag)",
+    "email" : "matteo_crosta@fastwebnet.it"
+  }],
+  "keywords" : [
+    "symfony geonames"
+  ],
+  "license" : [
+    "MIT"
+  ],
+  "require" : {
+  },
+  "autoload" : {
+    "psr-0" : {
+      "Company\\DemoBundle" : ""
+    }
+  },
+  "target-dir" : "MrFragIT/GeoNamesBundle",
+  "repositories" : [{
+  }],
+  "extra" : {
+    "branch-alias" : {
+      "dev-master" : "0-dev"
+    }
+  }
+}

@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="continent")
  * @ORM\Entity(repositoryClass="MrFragIT\GeoNamesBundle\Repository\ContinentRepository")
  */
-class Continent
+class Continent extends AbstractGeoNamesEntity implements GeoNamesEntityInterface
 {
     /**
      * @var int

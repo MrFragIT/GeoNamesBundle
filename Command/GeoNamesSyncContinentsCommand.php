@@ -7,7 +7,7 @@ use MrFragIT\GeoNamesBundle\Entity\Continent;
 
 class GeoNamesSyncContinentsCommand extends AbstractGeoNamesCommand
 {
-    const SOURCE_FILE    = '@GeoNamesBundle/Resources/geonames/continents.txt';
+    const SOURCE_FILE    = '@GeoNamesBundle/Resources/GeoNames/continents.txt';
 
     /**
      *
@@ -15,8 +15,8 @@ class GeoNamesSyncContinentsCommand extends AbstractGeoNamesCommand
     protected function configure()
     {
         $this
-            ->setName('geonames:sync:continents')
-            ->setDescription('Imports continents table from Geonames')
+            ->setName('GeoNames:sync:continents')
+            ->setDescription('Imports continents table from GeoNames')
             ->setDefaultOptions()
         ;
     }
@@ -24,9 +24,9 @@ class GeoNamesSyncContinentsCommand extends AbstractGeoNamesCommand
     /**
      * @return string
      */
-    protected function getGeonamesFilePath()
+    protected function getGeoNamesFilePath()
     {
-        return $this->getContainer()->get('kernel')->locateResource(self::SOURCE_FILE);
+        return $this->getContainer()->get('file_locator')->locate(self::SOURCE_FILE);
     }
 
     /**

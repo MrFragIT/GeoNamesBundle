@@ -3,6 +3,7 @@
 namespace MrFragIT\GeoNamesBundle\Command;
 
 
+use MrFragIT\GeoNamesBundle\Command\Abstracts\AbstractGeoNamesCommand;
 use MrFragIT\GeoNamesBundle\Entity\Continent;
 
 class GeoNamesSyncContinentsCommand extends AbstractGeoNamesCommand

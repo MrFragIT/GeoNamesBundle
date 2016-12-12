@@ -1,6 +1,6 @@
 <?php
 
-namespace MrFragIT\GeoNamesBundle\Command;
+namespace MrFragIT\GeoNamesBundle\Command\Abstracts;
 
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -11,7 +11,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Class AbstractGeoNamesCommand
+ * Class AbstractGeoNamesCmd
  * @package MrFragIT\GeoNamesBundle\Command
  */
 abstract class AbstractGeoNamesCommand extends ContainerAwareCommand

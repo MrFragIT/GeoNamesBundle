@@ -4,13 +4,14 @@ namespace GeonamesBundle\Helpers\RowDataTemplates;
 
 
 use MrFragIT\GeoNamesBundle\Parser\AbstractGeoNamesRow;
+use MrFragIT\GeoNamesBundle\Parser\GeoNamesRowDataInterface;
 use MrFragIT\GeoNamesBundle\Parser\RowDataInterface;
 
 /**
  * Class CityRowTemplate
  * @package GeonamesBundle\Helpers\RowDataTemplates
  */
-class CityRowTemplate extends AbstractGeoNamesRow  implements RowDataInterface
+class CityRowTemplate extends AbstractGeoNamesRow  implements GeoNamesRowDataInterface
 {
     public static function getAttributeNames() : array
     {

@@ -1,9 +1,10 @@
 <?php
 
-namespace MrFragIT\GeoNamesBundle\Command\Abstracts;
+namespace MrFragIT\GeoNamesBundle\Command;
 
 
 use Doctrine\ORM\EntityManagerInterface;
+use MrFragIT\GeoNamesBundle\Parser\GeoNamesFileParser;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,7 +18,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 abstract class AbstractGeoNamesCommand extends ContainerAwareCommand
 {
     protected $syncTs;
-    protected $dryRun = true;
     protected $input;
     protected $output;
 
@@ -132,22 +132,14 @@ abstract class AbstractGeoNamesCommand extends ContainerAwareCommand
 
         $progress->start();
         while ($item = $parser->parseLine()) {
-
             $this->rowsParsed++;
-
             if ($this->skipLine($item)) {
                 $this->rowsSkipped++;
                 continue;
             }
-
             $e = $em->getRepository($fqn)->findOneById($item->get('geonameId')) ?: (new \ReflectionClass($fqn))->newInstance();
-
             $this->parseLine($item, $e);
-
-            if (!$this->isDryRun()) {
-                $em->persist($e);
-            }
-
+            $em->persist($e);
             $progress->advance();
         }
         $progress->finish();

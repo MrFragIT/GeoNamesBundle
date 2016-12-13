@@ -3,12 +3,17 @@
 namespace MrFragIT\GeoNamesBundle\Command;
 
 
-use MrFragIT\GeoNamesBundle\Command\Abstracts\AbstractGeoNamesCommand;
 use MrFragIT\GeoNamesBundle\Entity\Continent;
+use MrFragIT\GeoNamesBundle\Parser\Template\ContinentRowTemplate;
 
+
+/**
+ * Class GeoNamesSyncContinentsCommand
+ * @package MrFragIT\GeoNamesBundle\Command
+ */
 class GeoNamesSyncContinentsCommand extends AbstractGeoNamesCommand
 {
-    const SOURCE_FILE    = '@GeoNamesBundle/Resources/GeoNames/continents.txt';
+    const SOURCE_FILE    = '@GeoNamesBundle/Resources/geonames/continents.txt';
 
     /**
      *

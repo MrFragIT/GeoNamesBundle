@@ -4,9 +4,13 @@ namespace MrFragIT\GeoNamesBundle\Parser;
 
 
 use Doctrine\Common\Collections\ArrayCollection;
-use GeoNamesBundle\Helpers\Interfaces\RowDataInterface;
 
-abstract class AbstractGeoNamesRow extends ArrayCollection implements RowDataInterface
+
+/**
+ * Class AbstractGeoNamesRow
+ * @package MrFragIT\GeoNamesBundle\Parser
+ */
+abstract class AbstractGeoNamesRow extends ArrayCollection implements GeoNamesRowDataInterface
 {
     /**
      * AbstractGeoNamesRow constructor.

@@ -3,7 +3,11 @@
 namespace MrFragIT\GeoNamesBundle\Parser;
 
 
-interface RowDataInterface
+/**
+ * Interface RowDataInterface
+ * @package MrFragIT\GeoNamesBundle\Parser
+ */
+interface GeoNamesRowDataInterface
 {
     /**
      * Returns an array mapping index to attribute names

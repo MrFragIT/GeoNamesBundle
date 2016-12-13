@@ -35,6 +35,15 @@ class Continent extends AbstractGeoNamesEntity implements GeoNamesEntityInterfac
      */
     private $name;
 
+    /**
+     * @param int $id
+     * @return Continent
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
 
     /**
      * Get id

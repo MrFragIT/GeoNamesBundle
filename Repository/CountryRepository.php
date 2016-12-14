@@ -1,6 +1,6 @@
 <?php
 
-namespace GeonamesBundle\Repository;
+namespace MrFragIT\GeoNamesBundle\Repository;
 
 /**
  * CountryRepository

@@ -113,7 +113,8 @@ abstract class AbstractGeoNamesCommand extends ContainerAwareCommand
 
         $this
             ->parseFile($this->getFilePath($input), $output)
-            ->deleteOldEntities($output);
+            ->deleteOldEntities($output)
+            ->cleanup();
 
         $output->writeln(sprintf('<info>Import completed</info>'));
 
@@ -210,5 +211,13 @@ abstract class AbstractGeoNamesCommand extends ContainerAwareCommand
     protected function getEntityManager()
     {
         return $this->getContainer()->get('doctrine')->getManager();
+    }
+
+    /**
+     *
+     */
+    protected function cleanup()
+    {
+
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace GeonamesBundle\Helpers\RowDataTemplates;
+namespace MrFragIT\GeoNamesBundle\Parser\Template;
 
 
 use MrFragIT\GeoNamesBundle\Parser\AbstractGeoNamesRow;
@@ -32,7 +32,8 @@ class CountryRowTemplate extends AbstractGeoNamesRow  implements GeoNamesRowData
             'postalCodeRegex',
             'languages',
             'geonameId',
-            'neighbours'
+            'neighbours',
+            'equivalentFipsCode'
         ];
     }
 

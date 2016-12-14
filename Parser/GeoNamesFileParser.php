@@ -43,15 +43,16 @@ class GeoNamesFileParser
      */
     public function parseLine()
     {
-        $line = fgets($this->fileHandler);
+        while($line = fgets($this->fileHandler)) {
+            // Skip comments and empty lines
+            if ($line{0} == '#' || !strlen($line)) continue;
 
-        if (!$line)
-            return null;
+            // Update stats
+            $this->parsedLines++;
 
-        // Update stats
-        $this->parsedLines++;
-
-        return (new \ReflectionClass($this->lineTemplateFQN))->newInstance($line);
+            return (new \ReflectionClass($this->lineTemplateFQN))->newInstance($line);
+        }
+        return null;
     }
 
     /**

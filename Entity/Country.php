@@ -141,6 +141,13 @@ class Country extends AbstractGeoNamesEntity implements GeoNamesEntityInterface
     protected $neighbours;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="equivalent_fips", type="string", length=2, nullable=true, unique=false))
+     */
+    protected $equivalentFipsCode;
+
+    /**
      * @var integer
      *
      * @ORM\Column(name="last_sync", type="integer", unique=false)
@@ -473,6 +480,24 @@ class Country extends AbstractGeoNamesEntity implements GeoNamesEntityInterface
     public function setNeighbours($neighbours)
     {
         $this->neighbours = $neighbours;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEquivalentFipsCode()
+    {
+        return $this->equivalentFipsCode;
+    }
+
+    /**
+     * @param string $equivalentFipsCode
+     * @return Country
+     */
+    public function setEquivalentFipsCode($equivalentFipsCode)
+    {
+        $this->equivalentFipsCode = $equivalentFipsCode;
         return $this;
     }
 

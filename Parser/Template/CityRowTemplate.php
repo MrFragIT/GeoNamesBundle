@@ -1,11 +1,10 @@
 <?php
 
-namespace GeonamesBundle\Helpers\RowDataTemplates;
+namespace MrFragIT\GeoNamesBundle\Parser\Template;
 
 
 use MrFragIT\GeoNamesBundle\Parser\AbstractGeoNamesRow;
 use MrFragIT\GeoNamesBundle\Parser\GeoNamesRowDataInterface;
-use MrFragIT\GeoNamesBundle\Parser\RowDataInterface;
 
 /**
  * Class CityRowTemplate

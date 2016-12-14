@@ -80,6 +80,11 @@ abstract class AbstractGeoNamesCommand extends ContainerAwareCommand
         return $this->syncTs;
     }
 
+    /**
+     * @param InputInterface $input
+     * @return mixed|string
+     * @throws \Exception
+     */
     protected function getFilePath(InputInterface $input)
     {
         $src = $input->getOption('src');
@@ -144,7 +149,7 @@ abstract class AbstractGeoNamesCommand extends ContainerAwareCommand
         }
         $progress->finish();
         $output->writeln('');
-        $output->writeln(sprintf('Persisting entities to database...'));
+        $output->writeln(sprintf('Persisting entities...'));
         $em->flush();
 
         return $this;

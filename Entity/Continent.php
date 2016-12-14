@@ -17,7 +17,7 @@ class Continent extends AbstractGeoNamesEntity implements GeoNamesEntityInterfac
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\GeneratedValue(strategy="NONE")
      */
     private $id;
 

@@ -13,7 +13,7 @@ use MrFragIT\GeoNamesBundle\Parser\Template\ContinentRowTemplate;
  */
 class GeoNamesSyncContinentsCommand extends AbstractGeoNamesCommand
 {
-    const SOURCE_FILE    = '@GeoNamesBundle/Resources/geonames/continents.txt';
+    const SOURCE_FILE = '@GeoNamesBundle/Resources/geonames/continents.txt';
 
     /**
      *
@@ -21,7 +21,7 @@ class GeoNamesSyncContinentsCommand extends AbstractGeoNamesCommand
     protected function configure()
     {
         $this
-            ->setName('GeoNames:sync:continents')
+            ->setName('geonames:sync:continents')
             ->setDescription('Imports continents table from GeoNames')
             ->setDefaultOptions()
         ;

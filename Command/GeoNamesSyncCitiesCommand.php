@@ -39,7 +39,7 @@ class GeoNamesSyncCitiesCommand extends AbstractGeoNamesCommand
 
     protected function getGeoNamesFilePath()
     {
-
+        //TODO Why???
     }
 
     protected function getRowTemplateClassFQN()

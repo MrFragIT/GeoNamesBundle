@@ -14,7 +14,7 @@ trait GeoNamesTxtDownload
 {
     public function downloadFromGeonames($url, $toFile)
     {
-        $this->output->writeln(sprintf('<info>Downloading %s</info>', self::SOURCE_URL));
+        $this->output->writeln(sprintf('<info>Downloading %s</info>', $url));
         try {
             (new Guzzle())->get($url, ['save_to' => $toFile]);
         }catch(\Exception $e) {

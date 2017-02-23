@@ -86,7 +86,7 @@ class GeoNamesSyncCitiesCommand extends AbstractGeoNamesCommand
                 throw new Exception(sprintf("Unable to find any country in continent %s, did you forget to import them?", $continent));
             }
             array_map(function($item){
-                $this->addCountry($item->iso);
+                $this->addCountry($item->getIso());
             }, $countries);
         }
     }

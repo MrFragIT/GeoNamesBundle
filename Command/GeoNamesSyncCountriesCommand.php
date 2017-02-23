@@ -11,20 +11,7 @@ use MrFragIT\GeoNamesBundle\Parser\Template\CountryRowTemplate;
  */
 class GeoNamesSyncCountriesCommand extends AbstractGeoNamesCommand
 {
-    use GeoNamesTxtDownload;
-
     const SOURCE_URL    = 'http://download.geonames.org/export/dump/countryInfo.txt';
-
-    private $tempFile;
-
-    /**
-     * GeoNamesSyncCountriesCommand constructor.
-     */
-    function __construct()
-    {
-        $this->tempFile = sys_get_temp_dir() . '/geonames_countries.zip';
-        return parent::__construct();
-    }
 
     /**
      *

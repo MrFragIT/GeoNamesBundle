@@ -1,6 +1,6 @@
 <?php
 
-namespace MrFragIT\GeoNamesBundle\Parser;
+namespace MrFragIT\GeoNamesBundle\Row;
 
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Class AbstractGeoNamesRow
- * @package MrFragIT\GeoNamesBundle\Parser
+ * @package MrFragIT\GeoNamesBundle\Row
  */
 abstract class AbstractGeoNamesRow extends ArrayCollection implements GeoNamesRowDataInterface
 {
@@ -31,8 +31,7 @@ abstract class AbstractGeoNamesRow extends ArrayCollection implements GeoNamesRo
 
         $data = [];
 
-        for($i=0; $i<count($attributes); $i++)
-        {
+        for ($i = 0; $i < count($attributes); $i++) {
             $attrName = $attributes[$i];
             $data[$attrName] = trim($exploded[$i]);
         }

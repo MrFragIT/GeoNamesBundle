@@ -1,11 +1,10 @@
 <?php
 
-namespace MrFragIT\GeoNamesBundle\Parser;
-
+namespace MrFragIT\GeoNamesBundle\Row;
 
 /**
- * Interface RowDataInterface
- * @package MrFragIT\GeoNamesBundle\Parser
+ * Interface GeoNamesRowDataInterface
+ * @package MrFragIT\GeoNamesBundle\Row
  */
 interface GeoNamesRowDataInterface
 {

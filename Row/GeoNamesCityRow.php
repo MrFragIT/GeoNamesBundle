@@ -1,16 +1,8 @@
 <?php
 
-namespace MrFragIT\GeoNamesBundle\Parser\Template;
+namespace MrFragIT\GeoNamesBundle\Row;
 
-
-use MrFragIT\GeoNamesBundle\Parser\AbstractGeoNamesRow;
-use MrFragIT\GeoNamesBundle\Parser\GeoNamesRowDataInterface;
-
-/**
- * Class CityRowTemplate
- * @package GeonamesBundle\Helpers\RowDataTemplates
- */
-class CityRowTemplate extends AbstractGeoNamesRow  implements GeoNamesRowDataInterface
+class GeoNamesCityRow extends AbstractGeoNamesRow implements GeoNamesRowDataInterface
 {
     public static function getAttributeNames() : array
     {

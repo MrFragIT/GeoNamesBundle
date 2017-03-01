@@ -3,6 +3,7 @@
 namespace MrFragIT\GeoNamesBundle\FileReader;
 
 use GuzzleHttp\Client as Guzzle;
+use MrFragIT\GeoNamesBundle\Common\WriteLnTrait;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -12,6 +13,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class GeoNamesFileReader
 {
+
+    use WriteLnTrait;
+
     private $output;
     private $tempFile;
     private $totalRows;
@@ -109,15 +113,6 @@ class GeoNamesFileReader
 
         unlink($this->tempFile);
         return $toFile;
-    }
-
-    /**
-     * @param $message
-     */
-    private function writeln($message): void
-    {
-        if ($this->output == null) return;
-        $this->output->writeln($message);
     }
 
     /**

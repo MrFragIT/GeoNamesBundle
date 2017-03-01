@@ -9,12 +9,12 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Class WriteLnTrait
  * @package MrFragIT\GeoNamesBundle\Common
  */
-class WriteLnTrait
+trait WriteLnTrait
 {
     /**
      * @param $message
      */
-    protected function writeln($message): void
+    public function writeln($message): void
     {
         if (isset($this->output) && $this->output instanceof OutputInterface) {
             $this->output->writeln($message);

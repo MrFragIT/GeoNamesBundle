@@ -14,10 +14,10 @@ abstract class AbstractGeoNamesRow extends ArrayCollection implements GeoNamesRo
 {
     /**
      * AbstractGeoNamesRow constructor.
-     * @param array $raw
+     * @param string $raw
      * @throws \Exception
      */
-    public function __construct($raw)
+    public function __construct(string $raw)
     {
         $attributes = static::getAttributeNames();
 
@@ -32,8 +32,7 @@ abstract class AbstractGeoNamesRow extends ArrayCollection implements GeoNamesRo
         $data = [];
 
         for ($i = 0; $i < count($attributes); $i++) {
-            $attrName = $attributes[$i];
-            $data[$attrName] = trim($exploded[$i]);
+            $data[$attributes[$i]] = trim($exploded[$i]);
         }
 
         // Initialize array collection

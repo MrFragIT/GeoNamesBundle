@@ -8,9 +8,10 @@
 
 namespace MrFragIT\GeoNamesBundle\Command;
 
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use GuzzleHttp\Client as Guzzle;
+
 
 /**
  * Class GeoNamesFileParser
@@ -24,57 +25,56 @@ class GeoNamesFileParser
 {
     private $input;
     private $output;
-    private $tempFile;
 
+    private $rowsParsed;
+    private $rowsSkipped;
+    private $syncTs;
+
+    /**
+     * GeoNamesFileParser constructor.
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     */
     public function __construct(InputInterface $input, OutputInterface $output)
     {
         $this->input = $input;
         $this->output = $output;
-        $tempFile = null;
-    }
-
-    public function downloadTxtFromGeonames($url)
-    {
-        $toFile = $this->getTempFile();
-        $this->output->writeln(sprintf('<info>Downloading %s</info>', $url));
-        try {
-            (new Guzzle())->get($url, ['save_to' => $toFile]);
-        } catch (\Exception $e) {
-            $this->output->writeln(sprintf("<error>Can't download %s</error>", $url));
-            return null;
-        }
-        $this->tempFile = $toFile;
-        return $this;
-    }
-
-    public function downloadZipFromGeonames($url)
-    {
-        $toExtract = str_replace(substr($url, strrpos($url, '/')), '.zip', '.txt');
-        $toFile = $this->getTempFile();
-        $this->downloadTxtFromGeonames($url);
-        $this->output->writeln(sprintf('<info>Extracting %s</info>', $this->tempFile));
-        try {
-            $zip = new \ZipArchive();
-            $zip->open($this->tempFile);
-            $zip->extractTo($toFile, [$toExtract]);
-        } catch (\Exception $e) {
-            $this->output->writeln(sprintf("<error>Can't extract file %s</error>", $this->tempFile));
-            return null;
-        }
-
-        unlink($this->tempFile);
-        $this->tempFile = $toFile;
-        return $this;
+        $this->tempFile = null;
+        $this->rowsParsed = 0;
+        $this->rowsSkipped = 0;
+        $this->syncTs = 0;
     }
 
 
     public function parse()
     {
-        // TODO implement me
+        $this->syncTs = time();
+        $this->rowsParsed = 0;
+        $this->rowsSkipped = 0;
+
+        $progress = new ProgressBar($this->output, $parser->getTotalLines());
+        $em = $this->getEntityManager();
+        $fqn = $this->getEntityClassFQN();
+
+        $progress->start();
+        while ($item = $parser->parseLine()) {
+            $this->rowsParsed++;
+            if ($this->skipLine($item)) {
+                $this->rowsSkipped++;
+                continue;
+            }
+            $e = $em->getRepository($fqn)->findOneById($item->get('geonameId')) ?: (new \ReflectionClass($fqn))->newInstance();
+            $this->parseLine($item, $e);
+            $em->persist($e);
+            $progress->advance();
+        }
+        $progress->finish();
+        $output->writeln('');
+        $output->writeln(sprintf('Persisting entities...'));
+        $em->flush();
+
+        return $this;
     }
 
-    private function getTempFile()
-    {
-        return sys_get_temp_dir() . '/' . base64_encode(random_bytes(10));
-    }
+
 }

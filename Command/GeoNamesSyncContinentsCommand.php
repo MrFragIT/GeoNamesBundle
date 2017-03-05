@@ -4,7 +4,11 @@ namespace MrFragIT\GeoNamesBundle\Command;
 
 
 use MrFragIT\GeoNamesBundle\Entity\Continent;
+use MrFragIT\GeoNamesBundle\FileImporter\GeoNamesContinentFileImporter;
+use MrFragIT\GeoNamesBundle\FileReader\GeoNamesFileReader;
 use MrFragIT\GeoNamesBundle\Parser\Template\ContinentRowTemplate;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 
 /**
@@ -36,18 +40,14 @@ class GeoNamesSyncContinentsCommand extends AbstractGeoNamesCommand
     }
 
     /**
-     * @return string
+     *
      */
-    protected function getRowTemplateClassFQN()
+    protected function import()
     {
-        return ContinentRowTemplate::class;
-    }
-
-    /**
-     * @return string
-     */
-    protected function getEntityClassFQN()
-    {
-        return Continent::class;
+        (new GeoNamesContinentFileImporter(
+            new GeoNamesFileReader($this->getGeoNamesFilePath(), $this->output),
+            $this->getEntityManager(),
+            $this->output
+        ))->parse()->deleteOldEntities();
     }
 }

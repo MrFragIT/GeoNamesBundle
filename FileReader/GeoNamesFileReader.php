@@ -63,8 +63,10 @@ class GeoNamesFileReader
 
             // Update stats
             $this->fetchedRows++;
+
+            return $line;
         }
-        return $line;
+        return false;
     }
 
     /**

@@ -5,7 +5,7 @@
  * Date: 15/12/16
  * Time: 23.17
  */
-
+/*
 namespace MrFragIT\GeoNamesBundle\Command;
 
 
@@ -131,3 +131,4 @@ class GeoNamesSyncCitiesCommand extends AbstractGeoNamesCommand
             $this->downloadList->add([$ccode => [self::BASE_GEONAMES_URL . $ccode . '.zip', $ccode.'.txt']]);
     }
 }
+*/

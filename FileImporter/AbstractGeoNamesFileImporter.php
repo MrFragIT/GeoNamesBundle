@@ -56,6 +56,22 @@ abstract class AbstractGeoNamesFileImporter
     }
 
     /**
+     * @param GeoNamesEntityInterface $entity
+     */
+    protected function persistEntity(GeoNamesEntityInterface $entity): void
+    {
+        $this->entityManager->persist($entity);
+    }
+
+    /**
+     *
+     */
+    protected function flushEntities(): void
+    {
+        $this->entityManager->flush();
+    }
+
+    /**
      * @return $this
      */
     public function parse()
@@ -63,8 +79,10 @@ abstract class AbstractGeoNamesFileImporter
         while ($rowStr = $this->fileReader->getRow()) {
             $line = (new \ReflectionClass($this->getRowObjectFQN()))->newInstance($rowStr);
             if ($this->skipLine($line)) continue;
-            $this->parseLine($line, $this->getEntity($line));
+            $entity = $this->parseLine($line, $this->getEntity($line));
+            $this->persistEntity($entity);
         }
+        $this->flushEntities();
         return $this;
     }
 
@@ -94,8 +112,9 @@ abstract class AbstractGeoNamesFileImporter
     /**
      * @param GeoNamesRowDataInterface $line
      * @param GeoNamesEntityInterface $entity
+     * @return GeoNamesEntityInterface
      */
-    protected function parseLine(GeoNamesRowDataInterface $line, GeoNamesEntityInterface $entity): void
+    protected function parseLine(GeoNamesRowDataInterface $line, GeoNamesEntityInterface $entity): GeoNamesEntityInterface
     {
         foreach ($line as $K => $V) {
             if ($K === 'geonameId') {
@@ -105,6 +124,7 @@ abstract class AbstractGeoNamesFileImporter
             }
             $entity->setLastSync($this->getSyncTs());
         }
+        return $entity;
     }
 
     /**

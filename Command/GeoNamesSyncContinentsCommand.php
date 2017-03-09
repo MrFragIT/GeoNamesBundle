@@ -3,13 +3,8 @@
 namespace MrFragIT\GeoNamesBundle\Command;
 
 
-use MrFragIT\GeoNamesBundle\Entity\Continent;
 use MrFragIT\GeoNamesBundle\FileImporter\GeoNamesContinentFileImporter;
 use MrFragIT\GeoNamesBundle\FileReader\GeoNamesFileReader;
-use MrFragIT\GeoNamesBundle\Parser\Template\ContinentRowTemplate;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-
 
 /**
  * Class GeoNamesSyncContinentsCommand
@@ -27,8 +22,7 @@ class GeoNamesSyncContinentsCommand extends AbstractGeoNamesCommand
         $this
             ->setName('geonames:sync:continents')
             ->setDescription('Imports continents table from GeoNames')
-            ->setDefaultOptions()
-        ;
+            ->setDefaultOptions();
     }
 
     /**

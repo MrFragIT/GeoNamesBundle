@@ -4,9 +4,7 @@ namespace MrFragIT\GeoNamesBundle\Command;
 
 
 use Doctrine\ORM\EntityManagerInterface;
-use MrFragIT\GeoNamesBundle\Parser\GeoNamesFileParser;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -33,7 +31,7 @@ abstract class AbstractGeoNamesCommand extends ContainerAwareCommand
      */
     protected function setDefaultOptions(): AbstractGeoNamesCommand
     {
-        $this->addOption('src', null,InputOption::VALUE_OPTIONAL, "Uncompressed GeoNames file to read data from",null);
+        $this->addOption('src', null, InputOption::VALUE_OPTIONAL, "Uncompressed GeoNames file to read data from", null);
         return $this;
     }
 
@@ -47,7 +45,7 @@ abstract class AbstractGeoNamesCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->$input = $input;
+        $this->input = $input;
         $this->output = $output;
         $this->import();
     }

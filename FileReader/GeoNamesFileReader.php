@@ -38,6 +38,7 @@ class GeoNamesFileReader
         } else if ($isUrl && strpos($path, '.zip') !== false) {
             $this->tempFile = $this->downloadZipFromGeonames($path);
         } else {
+            $this->writeln(sprintf('<comment>Using local source file: %s</comment>', $path));
             $this->tempFile = $path;
         }
 
@@ -46,9 +47,15 @@ class GeoNamesFileReader
             throw new Exception("Trying to download an unrecognized file, downloadable files must be in .txt or .zip format.");
         }
 
+        // Set local vars
         $this->fetchedRows = 0;
-        $this->totalRows = $this->countFileRows();
+        $this->totalRows = $this->countFileRows() ?: null;
         $this->fileHandler = fopen($this->tempFile, "r");
+
+        // Log to console
+        $this->writeln(sprintf('<comment>File contains %s lines.</comment>', $this->totalRows));
+        $this->writeln();
+
         return $this;
     }
 
@@ -70,6 +77,14 @@ class GeoNamesFileReader
     }
 
     /**
+     * @return int|null
+     */
+    public function getTotalRows(): ?int
+    {
+        return $this->totalRows;
+    }
+
+    /**
      * @return int
      */
     public function getFetchedRowsCount(): int
@@ -84,9 +99,11 @@ class GeoNamesFileReader
     private function downloadTxtFromGeonames(string $url): ?string
     {
         $toFile = $this->getTempFile();
-        $this->writeln(sprintf('<info>Downloading %s</info>', $url));
+        $this->writeln(sprintf('<comment>Downloading %s</comment>', $url));
+        $startTime = microtime(true);
         try {
             (new Guzzle())->get($url, ['save_to' => $toFile]);
+            $this->writeln(sprintf("<comment>Download took %f seconds.</comment>", microtime(true) - $startTime));
         } catch (\Exception $e) {
             $this->writeln(sprintf("<error>Can't download %s</error>", $url));
             return null;
@@ -103,7 +120,9 @@ class GeoNamesFileReader
         $toExtract = str_replace(substr($url, strrpos($url, '/')), '.zip', '.txt');
         $toFile = $this->getTempFile();
         $this->downloadTxtFromGeonames($url);
-        $this->writeln(sprintf('<info>Extracting %s</info>', $this->tempFile));
+        $this->writeln(sprintf('<comment>Extracting %s</comment>', $this->tempFile));
+        $startTime = microtime(true);
+
         try {
             $zip = new \ZipArchive();
             $zip->open($this->tempFile);
@@ -114,6 +133,8 @@ class GeoNamesFileReader
         }
 
         unlink($this->tempFile);
+
+        $this->writeln(sprintf("<comment>Extraction took %i seconds.</comment>", microtime(true) - $startTime));
         return $toFile;
     }
 
@@ -122,7 +143,8 @@ class GeoNamesFileReader
      */
     private function countFileRows(): int
     {
-        return intval(exec("wc -l '$this->tempFile'"));
+        //return intval(exec("wc -l '$this->tempFile'"));
+        return intval(exec("cat '$this->tempFile' | grep -v '^$\\|^\\s*\\#' | wc -l"));
     }
 
     /**

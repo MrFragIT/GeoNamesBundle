@@ -14,7 +14,7 @@ trait WriteLnTrait
     /**
      * @param $message
      */
-    public function writeln($message): void
+    public function writeln($message = "\r\n"): void
     {
         if (isset($this->output) && $this->output instanceof OutputInterface) {
             $this->output->writeln($message);

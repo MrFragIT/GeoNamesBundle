@@ -38,6 +38,7 @@ class GeoNamesSyncContinentsCommand extends AbstractGeoNamesCommand
      */
     protected function import()
     {
+        $this->output->writeln("\r\n<info>Importing continents</info>\r\n");
         (new GeoNamesContinentFileImporter(
             new GeoNamesFileReader($this->getGeoNamesFilePath(), $this->output),
             $this->getEntityManager(),

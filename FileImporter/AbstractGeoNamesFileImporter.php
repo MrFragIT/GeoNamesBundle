@@ -4,6 +4,7 @@ namespace MrFragIT\GeoNamesBundle\FileImporter;
 
 
 use Doctrine\ORM\EntityManagerInterface;
+use MrFragIT\GeoNamesBundle\Common\ProgressBarTrait;
 use MrFragIT\GeoNamesBundle\Common\WriteLnTrait;
 use MrFragIT\GeoNamesBundle\Entity\GeoNamesEntityInterface;
 use MrFragIT\GeoNamesBundle\FileReader\GeoNamesFileReader;
@@ -17,6 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 abstract class AbstractGeoNamesFileImporter
 {
     use WriteLnTrait;
+    use ProgressBarTrait;
 
     protected $fileReader;
     protected $syncTs;
@@ -76,12 +78,19 @@ abstract class AbstractGeoNamesFileImporter
      */
     public function parse()
     {
+        $this->writeln('Parsing file ...');
+        $this->setBar($this->fileReader->getTotalRows());
         while ($rowStr = $this->fileReader->getRow()) {
             $line = (new \ReflectionClass($this->getRowObjectFQN()))->newInstance($rowStr);
             if ($this->skipLine($line)) continue;
             $entity = $this->parseLine($line, $this->getEntity($line));
             $this->persistEntity($entity);
+            $this->advanceBar();
         }
+        $this->finishBar();
+        $this->writeln();
+
+        $this->writeln('Persisting entities');
         $this->flushEntities();
         return $this;
     }
@@ -91,6 +100,7 @@ abstract class AbstractGeoNamesFileImporter
      */
     public function deleteOldEntities(): AbstractGeoNamesFileImporter
     {
+        $this->writeln('Deleting old entities');
         $this->entityManager
             ->createQueryBuilder()
             ->delete($this->getEntityFQN(), 'e')

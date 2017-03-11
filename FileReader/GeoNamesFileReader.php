@@ -13,8 +13,10 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class GeoNamesFileReader
 {
-
     use WriteLnTrait;
+
+    const MAX_DOWNLOAD_ATTEMPTS = 6;
+    const SLEEP_BEFORE_NEXT_ATTEMPT = 10;
 
     private $output;
     private $tempFile;
@@ -34,7 +36,7 @@ class GeoNamesFileReader
 
         // Download file if needed
         if ($isUrl && strpos($path, '.txt') !== false) {
-            $this->tempFile = $this->downloadTxtFromGeonames($path);
+            $this->tempFile = $this->downloadFromGeonames($path);
         } else if ($isUrl && strpos($path, '.zip') !== false) {
             $this->tempFile = $this->downloadZipFromGeonames($path);
         } else {
@@ -94,9 +96,10 @@ class GeoNamesFileReader
 
     /**
      * @param string $url
+     * @param int $attempt
      * @return null|string
      */
-    private function downloadTxtFromGeonames(string $url): ?string
+    private function downloadFromGeonames(string $url, int $attempt = 0): ?string
     {
         $toFile = $this->getTempFile();
         $this->writeln(sprintf('<comment>Downloading %s</comment>', $url));
@@ -105,8 +108,17 @@ class GeoNamesFileReader
             (new Guzzle())->get($url, ['save_to' => $toFile]);
             $this->writeln(sprintf("<comment>Download took %f seconds.</comment>", microtime(true) - $startTime));
         } catch (\Exception $e) {
-            $this->writeln(sprintf("<error>Can't download %s</error>", $url));
-            return null;
+            $this->writeln(sprintf(
+                "<error>Can't download %s %s</error>",
+                $url,
+                $attempt < self::MAX_DOWNLOAD_ATTEMPTS ? sprintf('trying again in %d seconds.', self::SLEEP_BEFORE_NEXT_ATTEMPT) : ''));
+            $attempt++;
+            if ($attempt > self::MAX_DOWNLOAD_ATTEMPTS) {
+                throw new \Exception(sprintf("Can't download %s. Aborting", $url));
+            }
+
+            sleep(self::SLEEP_BEFORE_NEXT_ATTEMPT);
+            return $this->downloadFromGeonames($url, $attempt);
         }
         return $toFile;
     }
@@ -115,27 +127,28 @@ class GeoNamesFileReader
      * @param string $url
      * @return null|string
      */
-    private function downloadZipFromGeonames(string $url): ?string
+    private function downloadZipFromGeoNames(string $url): ?string
     {
-        $toExtract = str_replace(substr($url, strrpos($url, '/')), '.zip', '.txt');
-        $toFile = $this->getTempFile();
-        $this->downloadTxtFromGeonames($url);
-        $this->writeln(sprintf('<comment>Extracting %s</comment>', $this->tempFile));
+        $toExtract = str_replace('.zip', '.txt', substr($url, strrpos($url, '/') + 1));
+        $toPath = sys_get_temp_dir();
+        $zipFile = $this->downloadFromGeonames($url);
         $startTime = microtime(true);
+
+        $this->writeln(sprintf('<comment>Extracting %s</comment>', $zipFile));
 
         try {
             $zip = new \ZipArchive();
-            $zip->open($this->tempFile);
-            $zip->extractTo($toFile, [$toExtract]);
+            $zip->open($zipFile);
+            $zip->extractTo($toPath, [$toExtract]);
         } catch (\Exception $e) {
-            $this->writeln(sprintf("<error>Can't extract file %s</error>", $this->tempFile));
+            $this->writeln(sprintf("<error>Can't extract file %s</error>", $zipFile));
             return null;
         }
 
-        unlink($this->tempFile);
+        unlink($zipFile);
 
-        $this->writeln(sprintf("<comment>Extraction took %i seconds.</comment>", microtime(true) - $startTime));
-        return $toFile;
+        $this->writeln(sprintf("<comment>Extraction took %f seconds.</comment>", microtime(true) - $startTime));
+        return $toPath . '/' . $toExtract;
     }
 
     /**

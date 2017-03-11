@@ -24,6 +24,7 @@ abstract class AbstractGeoNamesFileImporter
     protected $syncTs;
     protected $entityManager;
     protected $output;
+    protected $skippedRowsCounter;
 
     /**
      * AbstractGeoNamesFileImporter constructor.
@@ -49,6 +50,76 @@ abstract class AbstractGeoNamesFileImporter
      */
     abstract protected function getEntityFQN(): string;
 
+    /**
+     * @param int $ts
+     * @return AbstractGeoNamesFileImporter
+     */
+    public function setSyncTs(int $ts): AbstractGeoNamesFileImporter
+    {
+        $this->syncTs = $ts;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSyncTs(): int
+    {
+        if (!$this->syncTs) {
+            $this->syncTs = time();
+        }
+        return $this->syncTs;
+    }
+
+    /**
+     * @return AbstractGeoNamesFileImporter
+     */
+    public function parse(): AbstractGeoNamesFileImporter
+    {
+        $this->setBar($this->fileReader->getTotalRows());
+        $this->skippedRowsCounter = 0;
+        while ($rowStr = $this->fileReader->getRow()) {
+            $this->advanceBar();
+
+            $line = (new \ReflectionClass($this->getRowObjectFQN()))->newInstance($rowStr);
+            if ($this->skipLine($line)) {
+                $this->skippedRowsCounter++;
+                continue;
+            }
+            $entity = $this->parseLine($line, $this->getEntity($line));
+            $this->persistEntity($entity);
+        }
+        $this->finishBar();
+        $this->writeln();
+
+        if ($this->skippedRowsCounter) {
+            $this->writeln(sprintf("<info>%d rows have been skipped</info>", $this->skippedRowsCounter));
+        }
+
+        $this->writeln('Persisting entities');
+        $this->flushEntities();
+        return $this;
+    }
+
+    /**
+     * @return AbstractGeoNamesFileImporter
+     */
+    public function deleteOldEntities(): AbstractGeoNamesFileImporter
+    {
+        $this->writeln('Deleting old entities');
+        $this->entityManager
+            ->createQueryBuilder()
+            ->delete($this->getEntityFQN(), 'e')
+            ->where('e.lastSync < :ts')
+            ->setParameter('ts', $this->getSyncTs())
+            ->getQuery()->getResult();
+        return $this;
+    }
+
+    /**
+     * @param GeoNamesRowDataInterface $line
+     * @return GeoNamesEntityInterface
+     */
     protected function getEntity(GeoNamesRowDataInterface $line): GeoNamesEntityInterface
     {
         return $this->entityManager
@@ -71,43 +142,6 @@ abstract class AbstractGeoNamesFileImporter
     protected function flushEntities(): void
     {
         $this->entityManager->flush();
-    }
-
-    /**
-     * @return $this
-     */
-    public function parse()
-    {
-        $this->writeln('Parsing file ...');
-        $this->setBar($this->fileReader->getTotalRows());
-        while ($rowStr = $this->fileReader->getRow()) {
-            $line = (new \ReflectionClass($this->getRowObjectFQN()))->newInstance($rowStr);
-            if ($this->skipLine($line)) continue;
-            $entity = $this->parseLine($line, $this->getEntity($line));
-            $this->persistEntity($entity);
-            $this->advanceBar();
-        }
-        $this->finishBar();
-        $this->writeln();
-
-        $this->writeln('Persisting entities');
-        $this->flushEntities();
-        return $this;
-    }
-
-    /**
-     * @return AbstractGeoNamesFileImporter
-     */
-    public function deleteOldEntities(): AbstractGeoNamesFileImporter
-    {
-        $this->writeln('Deleting old entities');
-        $this->entityManager
-            ->createQueryBuilder()
-            ->delete($this->getEntityFQN(), 'e')
-            ->where('e.lastSync < :ts')
-            ->setParameter('ts', $this->getSyncTs())
-            ->getQuery()->getResult();
-        return $this;
     }
 
     /**
@@ -135,16 +169,5 @@ abstract class AbstractGeoNamesFileImporter
             $entity->setLastSync($this->getSyncTs());
         }
         return $entity;
-    }
-
-    /**
-     * @return int
-     */
-    private function getSyncTs(): int
-    {
-        if (!$this->syncTs) {
-            $this->syncTs = time();
-        }
-        return $this->syncTs;
     }
 }

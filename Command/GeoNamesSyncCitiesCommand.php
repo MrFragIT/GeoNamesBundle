@@ -1,25 +1,20 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: frag
- * Date: 15/12/16
- * Time: 23.17
- */
-/*
+
 namespace MrFragIT\GeoNamesBundle\Command;
 
 
 use Doctrine\Common\Collections\ArrayCollection;
-use MrFragIT\GeoNamesBundle\Entity\City;
-use MrFragIT\GeoNamesBundle\Parser\Template\CityRowTemplate;
+use MrFragIT\GeoNamesBundle\Common\ProgressBarTrait;
+use MrFragIT\GeoNamesBundle\Common\WriteLnTrait;
+use MrFragIT\GeoNamesBundle\FileImporter\GeoNamesAllCountriesFileImporter;
+use MrFragIT\GeoNamesBundle\FileReader\GeoNamesFileReader;
 use Symfony\Component\Config\Definition\Exception\Exception;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 
 class GeoNamesSyncCitiesCommand extends AbstractGeoNamesCommand
 {
-    use GeoNamesZipDownload;
+    use WriteLnTrait;
+    use ProgressBarTrait;
 
     const BASE_GEONAMES_URL = 'http://download.geonames.org/export/dump/';
     const CITIES_1000_FILE  = 'cities1000.zip';
@@ -27,31 +22,22 @@ class GeoNamesSyncCitiesCommand extends AbstractGeoNamesCommand
     const CITIES_15000_FILE = 'cities15000.zip';
     const ALL_COUNTRIES     = 'allCountries.zip';
     const DEFAULT_SUBSET    = 'allCountries';
+    const FEATURE_CLASS = 'P';
 
     private $downloadList;
 
+    /**
+     * GeoNamesSyncCitiesCommand constructor.
+     */
     public function __construct()
     {
         $this->downloadList = new ArrayCollection();
         return parent::__construct();
     }
 
-
-    protected function getGeoNamesFilePath()
-    {
-        //TODO Why???
-    }
-
-    protected function getRowTemplateClassFQN()
-    {
-        return CityRowTemplate::class;
-    }
-
-    protected function getEntityClassFQN()
-    {
-        return City::class;
-    }
-
+    /**
+     *
+     */
     protected function configure()
     {
         $this
@@ -64,20 +50,47 @@ class GeoNamesSyncCitiesCommand extends AbstractGeoNamesCommand
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    /**
+     *
+     */
+    protected function import()
     {
-        $this->input    =   $input;
-        $this->output   =   $output;
+        $this->output->writeln("\r\n<info>Importing countries</info>\r\n");
 
-        if ($input->getOption('subset'))        $this->addSubset();
-        if ($input->getOption('continents'))    $this->addContinents();
-        if ($input->getOption('countries'))     $this->addCountries();
-        if (!$this->downloadList->count())      $this->addSubset(self::DEFAULT_SUBSET);
+        // Populate download list
+        if ($this->input->getOption('subset')) $this->addSubset();
+        if ($this->input->getOption('continents')) $this->addContinents();
+        if ($this->input->getOption('countries')) $this->addCountries();
+        if (!$this->downloadList->count()) $this->addSubset(self::DEFAULT_SUBSET);
 
-        return parent::execute($input, $output);
+        $this->writeln(sprintf("\r\n<comment>Download list contains %d items</comment>\r\n", $this->downloadList->count()));
+
+        $syncTs = time();
+        $importer = null;
+
+        // Parse every single item in the list
+        while ($url = $this->downloadList->current()) {
+            $importer = (new GeoNamesAllCountriesFileImporter(
+                new GeoNamesFileReader($url, $this->output),
+                $this->getEntityManager(),
+                $this->output
+            ))->setFeatureClass(self::FEATURE_CLASS)
+                ->setSyncTs($syncTs)
+                ->parse();
+
+            $this->downloadList->next();
+        }
+
+        // If many files have been imported, entities will be deleted with the same logic
+        if ($importer instanceof GeoNamesAllCountriesFileImporter) {
+            $importer->deleteOldEntities();
+        }
     }
 
-    protected function addContinents()
+    /**
+     *
+     */
+    protected function addContinents(): void
     {
         $continents = explode(',', strtoupper($this->input->getOption('continents')));
         foreach($continents as $continent) {
@@ -91,7 +104,10 @@ class GeoNamesSyncCitiesCommand extends AbstractGeoNamesCommand
         }
     }
 
-    protected function addCountries()
+    /**
+     *
+     */
+    protected function addCountries(): void
     {
         $countries = explode(',', strtoupper($this->input->getOption('countries')));
         foreach($countries as $country) {
@@ -99,7 +115,10 @@ class GeoNamesSyncCitiesCommand extends AbstractGeoNamesCommand
         }
     }
 
-    protected function addSubset($sub = null)
+    /**
+     * @param null $sub
+     */
+    protected function addSubset($sub = null): void
     {
         $sub = $sub ?: $this->input->getOption('subset');
 
@@ -109,26 +128,28 @@ class GeoNamesSyncCitiesCommand extends AbstractGeoNamesCommand
 
         switch($sub) {
             case 'cities1000':
-                $this->downloadList->add([self::BASE_GEONAMES_URL . self::CITIES_1000_FILE, 'cities1000.txt']);
+                $this->downloadList->add(self::BASE_GEONAMES_URL . self::CITIES_1000_FILE);
                 break;
             case 'cities5000':
-                $this->downloadList->add([self::BASE_GEONAMES_URL . self::CITIES_5000_FILE, 'cities5000.txt']);
+                $this->downloadList->add(self::BASE_GEONAMES_URL . self::CITIES_5000_FILE);
                 break;
             case 'cities15000':
-                $this->downloadList->add([self::BASE_GEONAMES_URL . self::CITIES_15000_FILE, 'cities15000.txt']);
+                $this->downloadList->add(self::BASE_GEONAMES_URL . self::CITIES_15000_FILE);
                 break;
             case 'allCountries':
-                $this->downloadList->add([self::BASE_GEONAMES_URL . self::ALL_COUNTRIES, 'allCountries.txt']);
+                $this->downloadList->add(self::BASE_GEONAMES_URL . self::ALL_COUNTRIES);
                 break;
             default:
                 throw new Exception("Invalid subset");
         }
     }
 
-    protected function addCountry($ccode)
+    /**
+     * @param $ccode
+     */
+    protected function addCountry($ccode): void
     {
         if (!$this->downloadList->containsKey($ccode))
-            $this->downloadList->add([$ccode => [self::BASE_GEONAMES_URL . $ccode . '.zip', $ccode.'.txt']]);
+            $this->downloadList->add(self::BASE_GEONAMES_URL . $ccode . '.zip');
     }
 }
-*/

@@ -2,7 +2,7 @@
 
 namespace MrFragIT\GeoNamesBundle\Row;
 
-class GeoNamesCityRow extends AbstractGeoNamesRow implements GeoNamesRowDataInterface
+class GeoNamesAllCountriesRow extends AbstractGeoNamesRow implements GeoNamesRowDataInterface
 {
     public static function getAttributeNames() : array
     {

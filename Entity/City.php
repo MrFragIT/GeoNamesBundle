@@ -413,7 +413,7 @@ class City extends AbstractGeoNamesEntity implements GeoNamesEntityInterface
      */
     public function setPopulation($population)
     {
-        $this->population = $population;
+        $this->population = (int)$population;
         return $this;
     }
 
@@ -431,7 +431,7 @@ class City extends AbstractGeoNamesEntity implements GeoNamesEntityInterface
      */
     public function setElevation($elevation)
     {
-        $this->elevation = $elevation;
+        $this->elevation = (int)$elevation;
         return $this;
     }
 
@@ -449,7 +449,7 @@ class City extends AbstractGeoNamesEntity implements GeoNamesEntityInterface
      */
     public function setDem($dem)
     {
-        $this->dem = $dem;
+        $this->dem = (int)$dem;
         return $this;
     }
 

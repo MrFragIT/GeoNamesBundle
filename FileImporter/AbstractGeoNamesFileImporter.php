@@ -20,11 +20,15 @@ abstract class AbstractGeoNamesFileImporter
     use WriteLnTrait;
     use ProgressBarTrait;
 
+    const FLUSH_THRESHOLD = 1000;
+
     protected $fileReader;
     protected $syncTs;
     protected $entityManager;
     protected $output;
     protected $skippedRowsCounter;
+
+    private $waitingForFlush;
 
     /**
      * AbstractGeoNamesFileImporter constructor.
@@ -78,6 +82,7 @@ abstract class AbstractGeoNamesFileImporter
     {
         $this->setBar($this->fileReader->getTotalRows());
         $this->skippedRowsCounter = 0;
+        $this->waitingForFlush = 0;
         while ($rowStr = $this->fileReader->getRow()) {
             $this->advanceBar();
 
@@ -88,7 +93,12 @@ abstract class AbstractGeoNamesFileImporter
             }
             $entity = $this->parseLine($line, $this->getEntity($line));
             $this->persistEntity($entity);
+
+            if ($this->waitingForFlush >= self::FLUSH_THRESHOLD) {
+                $this->flushEntities();
+            }
         }
+        $this->flushEntities();
         $this->finishBar();
         $this->writeln();
 
@@ -96,8 +106,6 @@ abstract class AbstractGeoNamesFileImporter
             $this->writeln(sprintf("<info>%d rows have been skipped</info>", $this->skippedRowsCounter));
         }
 
-        $this->writeln('Persisting entities');
-        $this->flushEntities();
         return $this;
     }
 
@@ -134,6 +142,7 @@ abstract class AbstractGeoNamesFileImporter
     protected function persistEntity(GeoNamesEntityInterface $entity): void
     {
         $this->entityManager->persist($entity);
+        $this->waitingForFlush++;
     }
 
     /**
@@ -142,6 +151,7 @@ abstract class AbstractGeoNamesFileImporter
     protected function flushEntities(): void
     {
         $this->entityManager->flush();
+        $this->waitingForFlush = 0;
     }
 
     /**

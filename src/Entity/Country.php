@@ -155,11 +155,6 @@ class Country extends AbstractGeoNamesEntity implements GeoNamesEntityInterface
     protected $lastSync;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Continent", inversedBy="countries")
-     */
-    protected $continent;
-
-    /**
      * @return int
      */
     public function getId()

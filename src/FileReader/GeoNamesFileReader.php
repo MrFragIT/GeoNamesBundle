@@ -2,6 +2,7 @@
 
 namespace GeoNames\FileReader;
 
+use ZipArchive;
 use GuzzleHttp\Client as Guzzle;
 use GeoNames\Common\WriteLnTrait;
 use Symfony\Component\Config\Definition\Exception\Exception;
@@ -98,6 +99,7 @@ class GeoNamesFileReader
      * @param string $url
      * @param int $attempt
      * @return null|string
+     * @throws \Exception
      */
     private function downloadFromGeonames(string $url, int $attempt = 0): ?string
     {
@@ -137,7 +139,7 @@ class GeoNamesFileReader
         $this->writeln(sprintf('<comment>Extracting %s</comment>', $zipFile));
 
         try {
-            $zip = new \ZipArchive();
+            $zip = new ZipArchive();
             $zip->open($zipFile);
             $zip->extractTo($toPath, [$toExtract]);
         } catch (\Exception $e) {

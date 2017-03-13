@@ -1,5 +1,5 @@
 {
-  "name" : "MrFragIT/GeoNamesBundle",
+  "name": "mrfragit/geo-names-bundle",
   "description" : "Simple importer for GeoNames.org data",
   "type" : "symfony-bundle",
   "authors" : [{
@@ -18,8 +18,16 @@
     "doctrine/orm": "^2.5",
     "guzzlehttp/guzzle": "^6.2"
   },
-  "repositories" : [{
-  }],
+  "autoload": {
+    "psr-4": {
+      "GeoNamesBundle\\": ""
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "GeoNamesBundle\\Tests\\": "tests/"
+    }
+  },
   "extra" : {
     "branch-alias" : {
       "dev-master" : "0-dev"

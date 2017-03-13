@@ -20,12 +20,12 @@
   },
   "autoload": {
     "psr-4": {
-      "GeoNamesBundle\\": ""
+      "MrFragIT\\GeoNamesBundle\\": ""
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "GeoNamesBundle\\Tests\\": "tests/"
+      "MrFragIT\\GeoNamesBundle\\Tests\\": "tests/"
     }
   },
   "extra" : {

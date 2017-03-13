@@ -1,6 +1,6 @@
 <?php
 
-namespace MrFragIT\GeoNamesBundle;
+namespace GeoNames;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
